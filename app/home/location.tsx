@@ -1,48 +1,41 @@
-import { useCallback, useEffect, useRef } from "react";
 import { StyleSheet, View, Pressable, Text, Animated } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import { useAirDropAnimation } from "../utils/useAirDropAnimation";
+import { registerPushNotificationsAsync } from "../utils/registerPushNotification";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function LocationPage() {
-  // Create multiple animated values for different waves
-  const animations = useRef([
-    new Animated.Value(0),
-    new Animated.Value(0),
-    new Animated.Value(0),
-  ]).current;
+  const { animations, isSendingLocation, setIsSendingLocation } =
+    useAirDropAnimation();
 
-  // Animation sequence for waves
-  const startAnimation = useCallback(() => {
-    // Reset animations
-    animations.forEach((anim) => anim.setValue(0));
+  async function scheduleNotification() {
+    console.log("Triggering notification...");
 
-    // Create staggered animations
-    const createWaveAnimation = (animation: Animated.Value, delay: number) => {
-      return Animated.sequence([
-        Animated.delay(delay),
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(animation, {
-              toValue: 1,
-              duration: 2000,
-              useNativeDriver: true,
-            }),
-            Animated.timing(animation, {
-              toValue: 0,
-              duration: 0,
-              useNativeDriver: true,
-            }),
-          ]),
-        ),
-      ]);
-    };
+    // Register and get the permission status
+    const status = await registerPushNotificationsAsync();
 
-    // Start animations with different delays
-    Animated.parallel(
-      animations.map((animation, index) =>
-        createWaveAnimation(animation, index * 666),
-      ),
-    ).start();
-  }, []);
+    if (status === "granted") {
+      // Schedule the notification
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Location Sharing",
+          body: "Location sharing is active",
+        },
+        trigger: null,
+      });
+
+      console.log("Notification scheduled!");
+    } else {
+      console.log("Notification permissions not granted.");
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -79,9 +72,17 @@ export default function LocationPage() {
       {/* Start button */}
       <Pressable
         style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
-        onPress={startAnimation}
+        onPress={() => setIsSendingLocation((prev) => !prev)}
       >
-        <Text style={styles.buttonText}>Start</Text>
+        <Text style={styles.buttonText}>
+          {!isSendingLocation ? "Start" : "Stop"}
+        </Text>
+      </Pressable>
+      <Pressable
+        style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
+        onPress={() => scheduleNotification()}
+      >
+        <Text style={styles.buttonText}>Push Notification</Text>
       </Pressable>
     </View>
   );

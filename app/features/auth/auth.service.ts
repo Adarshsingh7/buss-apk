@@ -10,7 +10,6 @@ class Auth {
       baseURL: "https://sea-turtle-app-uixi3.ondigitalocean.app/api/v1/users",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${this.getToken()}`,
       },
     });
     this.login = this.login.bind(this);
@@ -18,7 +17,15 @@ class Auth {
     this.logout = this.logout.bind(this);
     this.getToken = this.getToken.bind(this);
     this.isAuthenticated = this.isAuthenticated.bind(this);
+    this.setAuthHeader = this.setAuthHeader.bind(this);
   }
+
+  setAuthHeader = async () => {
+    const token = await this.getToken();
+    if (token) {
+      this.api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+  };
 
   login = async (body: { email: string; password: string }) => {
     const response = await this.api.post("/login", body);
@@ -61,7 +68,7 @@ class Auth {
     }
   };
 
-  clearToken = async (): Promise<void> => {
+  private clearToken = async (): Promise<void> => {
     try {
       await AsyncStorage.removeItem("token");
     } catch (error) {

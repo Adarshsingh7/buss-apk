@@ -29,11 +29,11 @@ const LoginScreen = () => {
     queryFn: auth.isAuthenticated,
   });
 
-  const { mutate: reAuth } = useReAuth();
+  const { mutate: reAuth, isPending: reAuthenicating } = useReAuth();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (email && password) {
-      auth.login({ email, password });
+      await auth.login({ email, password });
       reAuth();
     } else {
       Alert.alert("Error", "Please enter both email and password");
@@ -42,7 +42,7 @@ const LoginScreen = () => {
 
   useEffect(() => {
     if (activeUser) navigation.navigate("/home");
-  }, [isPending]);
+  }, [isPending, reAuthenicating]);
 
   return (
     <QueryClientProvider client={queryClient}>
