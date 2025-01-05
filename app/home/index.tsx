@@ -22,7 +22,6 @@ export default function index() {
   if (isLoading) return <LoadingScreen />;
 
   if (!data || data.length === 0) {
-    console.log("no data");
     return (
       <View style={styles.container}>
         <Text style={styles.noStopsText}>Huray! you have no stops</Text>

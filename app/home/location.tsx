@@ -1,39 +1,19 @@
 import { StyleSheet, View, Pressable, Text, Animated } from "react-native";
-import { useAirDropAnimation } from "../utils/useAirDropAnimation";
-import { registerPushNotificationsAsync } from "../utils/registerPushNotification";
-import * as Notifications from "expo-notifications";
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+import { useAirDropAnimation } from "../hooks/useAirDropAnimation";
+import { useLocationNotification } from "../hooks/useLocationNotification";
 
 export default function LocationPage() {
   const { animations, isSendingLocation, setIsSendingLocation } =
     useAirDropAnimation();
+  const { scheduleNotification, onCancelNotification } =
+    useLocationNotification();
 
-  async function scheduleNotification() {
-    console.log("Triggering notification...");
-
-    // Register and get the permission status
-    const status = await registerPushNotificationsAsync();
-
-    if (status === "granted") {
-      // Schedule the notification
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Location Sharing",
-          body: "Location sharing is active",
-        },
-        trigger: null,
-      });
-
-      console.log("Notification scheduled!");
+  function handleToggleLocationSharing() {
+    setIsSendingLocation((prev) => !prev);
+    if (isSendingLocation) {
+      onCancelNotification();
     } else {
-      console.log("Notification permissions not granted.");
+      scheduleNotification();
     }
   }
 
@@ -72,17 +52,11 @@ export default function LocationPage() {
       {/* Start button */}
       <Pressable
         style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
-        onPress={() => setIsSendingLocation((prev) => !prev)}
+        onPress={handleToggleLocationSharing}
       >
         <Text style={styles.buttonText}>
           {!isSendingLocation ? "Start" : "Stop"}
         </Text>
-      </Pressable>
-      <Pressable
-        style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
-        onPress={() => scheduleNotification()}
-      >
-        <Text style={styles.buttonText}>Push Notification</Text>
       </Pressable>
     </View>
   );
