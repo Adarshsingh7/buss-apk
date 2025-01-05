@@ -9,10 +9,11 @@ export const useAirDropAnimation = () => {
     new Animated.Value(0),
   ]).current;
 
-  const [isSendingLocation, setIsSendingLocation] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Animation sequence for waves
   const startAnimation = useCallback(() => {
+    setIsAnimating(true);
     // Reset animations
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     animations.forEach((anim) => anim.setValue(0));
@@ -47,18 +48,11 @@ export const useAirDropAnimation = () => {
   }, []);
 
   const stopAnimation = useCallback(() => {
+    setIsAnimating(false);
     animations.forEach((anim) => {
       anim.stopAnimation(() => anim.setValue(0));
     });
   }, []);
 
-  useEffect(() => {
-    if (isSendingLocation) {
-      startAnimation();
-    } else {
-      stopAnimation();
-    }
-  }, [isSendingLocation]);
-
-  return { isSendingLocation, setIsSendingLocation, animations };
+  return { startAnimation, stopAnimation, animations, isAnimating };
 };

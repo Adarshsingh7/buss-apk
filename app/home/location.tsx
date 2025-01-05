@@ -1,21 +1,24 @@
 import { StyleSheet, View, Pressable, Text, Animated } from "react-native";
 import { useAirDropAnimation } from "../hooks/useAirDropAnimation";
-import { useLocationNotification } from "../hooks/useLocationNotification";
+import { useGPSNavigation } from "../hooks/useGPSNavigation";
 
 export default function LocationPage() {
-  const { animations, isSendingLocation, setIsSendingLocation } =
+  const { animations, isAnimating, startAnimation, stopAnimation } =
     useAirDropAnimation();
-  const { scheduleNotification, onCancelNotification } =
-    useLocationNotification();
+  const { startGPSNavigationService, stopGPSNavigationService } =
+    useGPSNavigation();
 
   function handleToggleLocationSharing() {
-    setIsSendingLocation((prev) => !prev);
-    if (isSendingLocation) {
-      onCancelNotification();
+    if (!isAnimating) {
+      startGPSNavigationService();
+      startAnimation();
     } else {
-      scheduleNotification();
+      stopGPSNavigationService(stopAnimation);
+      stopAnimation();
     }
   }
+
+  console.log({ isAnimating });
 
   return (
     <View style={styles.container}>
@@ -54,9 +57,7 @@ export default function LocationPage() {
         style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
         onPress={handleToggleLocationSharing}
       >
-        <Text style={styles.buttonText}>
-          {!isSendingLocation ? "Start" : "Stop"}
-        </Text>
+        <Text style={styles.buttonText}>{!isAnimating ? "Start" : "Stop"}</Text>
       </Pressable>
     </View>
   );

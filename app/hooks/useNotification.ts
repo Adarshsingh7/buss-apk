@@ -2,7 +2,19 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
 import { useRegisterPushNotifications } from "./useRegisterPushNotification";
 
-export const useLocationNotification = () => {
+interface Props {
+  onCancelNotification?: () => void;
+  title: string;
+  body: string;
+  category: string;
+}
+
+export const useNotification = ({
+  onCancelNotification,
+  title,
+  body,
+  category,
+}: Props) => {
   const [notificationId, setNotificationId] = useState<string | null>(null);
   const { status } = useRegisterPushNotifications();
 
@@ -14,7 +26,7 @@ export const useLocationNotification = () => {
     }),
   });
 
-  Notifications.setNotificationCategoryAsync("location-category", [
+  Notifications.setNotificationCategoryAsync(category, [
     {
       identifier: "cancel-action",
       buttonTitle: "Cancel",
@@ -27,7 +39,8 @@ export const useLocationNotification = () => {
 
   Notifications.addNotificationResponseReceivedListener((response) => {
     if (response.actionIdentifier === "cancel-action") {
-      handleCancelAction(); // Run the custom function
+      handleCancelAction();
+      customNotificationClose(() => {});
     }
   });
 
@@ -35,6 +48,7 @@ export const useLocationNotification = () => {
   async function handleCancelAction() {
     if (notificationId) {
       await Notifications.dismissNotificationAsync(notificationId);
+      if (onCancelNotification) onCancelNotification();
     }
   }
 
@@ -54,9 +68,9 @@ export const useLocationNotification = () => {
       // Schedule the notification
       const id = await Notifications.scheduleNotificationAsync({
         content: {
-          title: "Location Sharing",
-          body: "Location sharing is active.",
-          categoryIdentifier: "location-category", // Associate category
+          title: title,
+          body: body,
+          categoryIdentifier: category, // Associate category
         },
         trigger: null,
       });
@@ -67,5 +81,13 @@ export const useLocationNotification = () => {
     }
   }
 
-  return { scheduleNotification, onCancelNotification: handleCancelAction };
+  function customNotificationClose(fn: () => void) {
+    if (fn) fn();
+  }
+
+  return {
+    scheduleNotification,
+    onCancelNotification: handleCancelAction,
+    customNotificationClose,
+  };
 };
