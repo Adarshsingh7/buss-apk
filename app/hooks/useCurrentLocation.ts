@@ -9,7 +9,8 @@ export function useCurrentLocation() {
   );
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isFetching, setIsFetching] = useState<boolean>(true);
-  let subscription: Location.LocationSubscription | null = null;
+  const [subscription, setSubscription] =
+    useState<Location.LocationSubscription | null>(null);
 
   async function startLocationUpdates() {
     if (Platform.OS === "android" && !Device.isDevice) {
@@ -27,7 +28,7 @@ export function useCurrentLocation() {
     }
 
     if (subscription == null) {
-      subscription = await Location.watchPositionAsync(
+      const res = await Location.watchPositionAsync(
         {
           accuracy: Location.Accuracy.BestForNavigation,
           timeInterval: 1000,
@@ -38,6 +39,7 @@ export function useCurrentLocation() {
           setIsFetching(false);
         },
       );
+      setSubscription(res);
     }
   }
 
@@ -52,7 +54,7 @@ export function useCurrentLocation() {
   function stopLocationUpdates() {
     if (subscription) {
       subscription.remove();
-      subscription = null;
+      setSubscription(null);
       setIsFetching(false);
     }
   }

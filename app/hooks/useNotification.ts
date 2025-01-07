@@ -40,7 +40,6 @@ export const useNotification = ({
   Notifications.addNotificationResponseReceivedListener((response) => {
     if (response.actionIdentifier === "cancel-action") {
       handleCancelAction();
-      customNotificationClose(() => {});
     }
   });
 

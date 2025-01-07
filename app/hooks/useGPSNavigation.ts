@@ -3,7 +3,11 @@ import { useAirDropAnimation } from "./useAirDropAnimation";
 import { useCurrentLocation } from "./useCurrentLocation";
 import { useNotification } from "./useNotification";
 
-export const useGPSNavigation = () => {
+interface Props {
+  customFunction?: () => void;
+}
+
+export const useGPSNavigation = ({ customFunction }: Props) => {
   const {
     location,
     startLocationUpdates,
@@ -11,14 +15,11 @@ export const useGPSNavigation = () => {
     isFetching,
     errorMsg,
   } = useCurrentLocation();
-  const {
-    onCancelNotification,
-    scheduleNotification,
-    customNotificationClose,
-  } = useNotification({
+  const { onCancelNotification, scheduleNotification } = useNotification({
     body: "sharing of live location is active",
     category: "location-sharing",
     title: "Location Sharing",
+    onCancelNotification: customFunction,
   });
 
   const startGPSNavigationService = async () => {
@@ -26,10 +27,9 @@ export const useGPSNavigation = () => {
     scheduleNotification();
   };
 
-  const stopGPSNavigationService = (fn: () => void) => {
+  const stopGPSNavigationService = () => {
     stopLocationUpdates();
     onCancelNotification();
-    customNotificationClose(fn);
   };
 
   return { startGPSNavigationService, stopGPSNavigationService };

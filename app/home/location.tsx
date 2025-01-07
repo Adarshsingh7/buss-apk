@@ -6,19 +6,17 @@ export default function LocationPage() {
   const { animations, isAnimating, startAnimation, stopAnimation } =
     useAirDropAnimation();
   const { startGPSNavigationService, stopGPSNavigationService } =
-    useGPSNavigation();
+    useGPSNavigation({ customFunction: stopAnimation });
 
   function handleToggleLocationSharing() {
     if (!isAnimating) {
       startGPSNavigationService();
       startAnimation();
     } else {
-      stopGPSNavigationService(stopAnimation);
+      stopGPSNavigationService();
       stopAnimation();
     }
   }
-
-  console.log({ isAnimating });
 
   return (
     <View style={styles.container}>
