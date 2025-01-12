@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
+import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 
 export function useCurrentLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -27,6 +28,7 @@ export function useCurrentLocation() {
       return;
     }
 
+    activateKeepAwake();
     if (subscription == null) {
       const res = await Location.watchPositionAsync(
         {
@@ -53,6 +55,7 @@ export function useCurrentLocation() {
 
   function stopLocationUpdates() {
     if (subscription) {
+      deactivateKeepAwake();
       subscription.remove();
       setSubscription(null);
       setIsFetching(false);
