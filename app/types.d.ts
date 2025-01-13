@@ -41,6 +41,16 @@ interface RouteType {
   user?: string;
 }
 
-export { UserType, StopType, RouteType };
+interface LocationType {
+  _id: string;
+  latitude: number;
+  longitude: number;
+  user: string;
+  address?: string;
+  createdAt?: Date;
+  updatedAt?: Date | null;
+}
+
+export { UserType, StopType, RouteType, LocationType };
 
 export default {};

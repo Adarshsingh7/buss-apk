@@ -17,7 +17,6 @@ export const useNotification = ({
 }: Props) => {
   const [notificationId, setNotificationId] = useState<string | null>(null);
   const { status } = useRegisterPushNotifications();
-
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,

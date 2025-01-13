@@ -1,8 +1,11 @@
-import { useState, useEffect } from "react";
-import * as Location from "expo-location";
+import { useState, useEffect, useRef } from "react";
 import { Platform } from "react-native";
+import * as Location from "expo-location";
 import * as Device from "expo-device";
-import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import { useQuery } from "@tanstack/react-query";
+import { LocationType, UserType } from "../types";
+import { location as locationService } from "../features/location/location.service";
 
 export function useCurrentLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
@@ -12,6 +15,22 @@ export function useCurrentLocation() {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [subscription, setSubscription] =
     useState<Location.LocationSubscription | null>(null);
+  const locationRef = useRef<Location.LocationObject | null>(null);
+
+  const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
+  const { data: locationData } = useQuery<LocationType>({
+    queryKey: ["location"],
+  });
+
+  function stopLocationUpdates() {
+    if (subscription) {
+      locationRef.current = null;
+      deactivateKeepAwake();
+      subscription.remove();
+      setSubscription(null);
+      setIsFetching(false);
+    }
+  }
 
   async function startLocationUpdates() {
     if (Platform.OS === "android" && !Device.isDevice) {
@@ -28,7 +47,7 @@ export function useCurrentLocation() {
       return;
     }
 
-    activateKeepAwake();
+    activateKeepAwakeAsync();
     if (subscription == null) {
       const res = await Location.watchPositionAsync(
         {
@@ -38,6 +57,7 @@ export function useCurrentLocation() {
         },
         (newLocation) => {
           setLocation(newLocation);
+          locationRef.current = newLocation;
           setIsFetching(false);
         },
       );
@@ -51,16 +71,30 @@ export function useCurrentLocation() {
         subscription.remove();
       }
     };
-  }, []);
+  }, [subscription]);
 
-  function stopLocationUpdates() {
-    if (subscription) {
-      deactivateKeepAwake();
-      subscription.remove();
-      setSubscription(null);
-      setIsFetching(false);
+  useEffect(() => {
+    async function sendLocation() {
+      try {
+        if (
+          authUser?.role === "driver" &&
+          locationRef.current &&
+          locationData
+        ) {
+          console.log(`sending location ${locationData}`);
+          await locationService.updateLocation(locationData._id, {
+            latitude: locationRef.current.coords.latitude,
+            longitude: locationRef.current.coords.longitude,
+          });
+        }
+      } catch (error) {
+        console.error("Failed to send location:", error);
+      }
     }
-  }
+    const intervalId = setInterval(sendLocation, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [authUser, locationData]);
 
   let text = "Waiting...";
   if (errorMsg) {

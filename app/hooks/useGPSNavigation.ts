@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from "react";
-import { useAirDropAnimation } from "./useAirDropAnimation";
 import { useCurrentLocation } from "./useCurrentLocation";
 import { useNotification } from "./useNotification";
 

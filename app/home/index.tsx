@@ -8,15 +8,22 @@ import {
 } from "react-native";
 import TrainStopContainer from "../components/StopContainer";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { StopType, UserType } from "../types";
 import convertStringToTime from "../utils/dateFormat";
 import { useGetUserRoute } from "../features/route/route.hook";
 import LoadingScreen from "../components/LoadingScreen";
+import { location } from "../features/location/location.service";
 
 export default function index() {
   const { data: activeUser } = useQuery<UserType>({ queryKey: ["user"] });
-
+  useQuery({
+    queryKey: ["location"],
+    queryFn: () => location.getLocationFromRoute(activeUser?.route || ""),
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: false,
+  });
   const { filteredStop: data, isLoading } = useGetUserRoute();
 
   if (isLoading) return <LoadingScreen />;
