@@ -1,14 +1,19 @@
 import { StyleSheet, View, Pressable, Text, Animated } from "react-native";
 import { useAirDropAnimation } from "../hooks/useAirDropAnimation";
 import { useGPSNavigation } from "../hooks/useGPSNavigation";
+import { useQuery } from "@tanstack/react-query";
+import { UserType } from "../types";
 
 export default function LocationPage() {
   const { animations, isAnimating, startAnimation, stopAnimation } =
     useAirDropAnimation();
   const { startGPSNavigationService, stopGPSNavigationService } =
     useGPSNavigation({ customFunction: stopAnimation });
+  const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
 
   function handleToggleLocationSharing() {
+    if (authUser?.role !== "driver")
+      return alert("Only drivers can start the location sharing");
     if (!isAnimating) {
       startGPSNavigationService();
       startAnimation();

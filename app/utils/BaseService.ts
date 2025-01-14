@@ -61,6 +61,7 @@ class BaseService<T> {
   // Update an existing resource by ID
   async update(id: string | number, data: Partial<T>): Promise<T> {
     await this.ensureToken();
+    console.log(data);
     const response: AxiosResponse<{ data: T }> = await this.api.patch(
       `/${id}`,
       data,

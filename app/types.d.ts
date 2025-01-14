@@ -29,6 +29,7 @@ interface StopType {
   longitude: number;
   address: string;
   arrivalTime: string;
+  arrivalStatus: "pending" | "completed";
   user?: string;
 }
 

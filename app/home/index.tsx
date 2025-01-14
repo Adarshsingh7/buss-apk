@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import TrainStopContainer from "../components/StopContainer";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { StopType, UserType } from "../types";
 import convertStringToTime from "../utils/dateFormat";
@@ -17,14 +17,28 @@ import { location } from "../features/location/location.service";
 
 export default function index() {
   const { data: activeUser } = useQuery<UserType>({ queryKey: ["user"] });
-  useQuery({
+  const { data: loc } = useQuery({
     queryKey: ["location"],
     queryFn: () => location.getLocationFromRoute(activeUser?.route || ""),
-    refetchInterval: 5000,
-    refetchIntervalInBackground: true,
-    refetchOnWindowFocus: false,
   });
+
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["stops"] });
+      return 1;
+    },
+  });
+  useEffect(() => {
+    const interval = setInterval(() => {
+      mutate();
+    }, 10 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const { filteredStop: data, isLoading } = useGetUserRoute();
+  // console.log(data);
 
   if (isLoading) return <LoadingScreen />;
 
@@ -43,6 +57,7 @@ export default function index() {
           arrivalTime={stop.arrivalTime}
           dispatchTime={stop.arrivalTime}
           stopName={stop.name}
+          status={stop.arrivalStatus}
         />
       ))}
     </ScrollView>
