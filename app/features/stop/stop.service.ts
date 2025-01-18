@@ -1,5 +1,5 @@
 import { StopType } from "@/app/types";
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 class Stop {
   private api: AxiosInstance | null = null;
@@ -26,6 +26,23 @@ class Stop {
     return this.api;
   }
 
+  disableStopStatus = async (routeId: string) => {
+    try {
+      const api = await this.getApiInstance();
+      const response = await api.post(`/disable-status?route-id=${routeId}`);
+      if (response.status === 200) {
+        return response.data.data;
+      } else {
+        throw new Error(
+          `Failed to disable stop status: ${response.statusText}`,
+        );
+      }
+    } catch (error: any) {
+      console.error(error.response?.data || error.message);
+      throw error;
+    }
+  };
+
   getAllStops = async () => {
     const api = await this.getApiInstance();
     const response = await api.get("");
@@ -51,10 +68,19 @@ class Stop {
     if (response.status === 200) return response.data.data;
   };
 
-  updateStop = async (body: StopType) => {
-    const api = await this.getApiInstance();
-    const response = await api.patch(`/${body._id}`, body);
-    if (response.status === 200) return response.data.data;
+  updateStop = async (id: string, body: Partial<StopType>) => {
+    try {
+      const api = await this.getApiInstance();
+      const response = await api.patch(`/${id}`, body);
+      if (response.status === 200) {
+        return response.data.data;
+      } else {
+        throw new Error(`Failed to update stop: ${response.statusText}`);
+      }
+    } catch (error: any) {
+      console.error(error.response?.data);
+      throw error;
+    }
   };
 
   getToken = async (): Promise<string | null> => {

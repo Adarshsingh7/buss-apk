@@ -1,44 +1,36 @@
-import { Entypo, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  Pressable,
-} from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { UserType } from "../types";
+import { useChangeStopStatus } from "../features/stop/stop.hook";
+import LoadingScreen from "./LoadingScreen";
+import DialogAction from "./DialogAction";
 
 const TrainStopContainer = ({
   stopName = "Station A",
   arrivalTime = "10:30 AM",
   dispatchTime = "10:40 AM",
-  timeLeft = "5 min",
   lateStatus = false,
   distance = "5 km",
   status = "waiting",
+  id = "0",
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentStatus, setCurrentStatus] = useState(status);
   const lateColor = lateStatus ? "#FF4C4C" : "#4CAF50";
   const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
+  const { mutate, isPending } = useChangeStopStatus();
 
-  const handleStatusChange = (newStatus: string) => {
-    setCurrentStatus(newStatus);
+  const handleStatusChange = (newStatus: "arrived" | "waiting") => {
     setModalVisible(false);
+    mutate({ id, arrivalStatus: newStatus });
   };
 
-  useEffect(() => {
-    setCurrentStatus(status);
-  }, [status]);
+  // if (isPending) return <LoadingScreen />;
 
   return (
     <View
-      style={
-        currentStatus === "waiting" ? styles.container : styles.coloredContainer
-      }
+      style={status === "waiting" ? styles.container : styles.coloredContainer}
     >
       <View style={styles.header}>
         <Text style={styles.stopName}>{stopName}</Text>
@@ -46,6 +38,7 @@ const TrainStopContainer = ({
           {lateStatus ? "Late" : "On Time"}
         </Text>
       </View>
+      {isPending && <LoadingScreen />}
       <View style={styles.detailsRow}>
         <View style={styles.detailItem}>
           <Text style={styles.label}>Arrival</Text>
@@ -67,44 +60,14 @@ const TrainStopContainer = ({
           </Pressable>
         )}
       </View>
-      {authUser?.role === "driver" && (
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            setModalVisible(!modalVisible);
-          }}
-        >
-          <Pressable
-            style={styles.modalBackground}
-            onPress={() => setModalVisible(false)}
-          >
-            <View style={styles.fullWidthModalView}>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.closeButtonText}>
-                  <Entypo name="cross" size={24} color="black" />
-                </Text>
-              </TouchableOpacity>
-              <Text style={styles.modalText}>Mark stop as:</Text>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleStatusChange("arrived")}
-              >
-                <Text style={styles.buttonText}>Arrived</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => handleStatusChange("waiting")}
-              >
-                <Text style={styles.buttonText}>Waiting</Text>
-              </TouchableOpacity>
-            </View>
-          </Pressable>
-        </Modal>
+      {authUser?.role === "driver" && modalVisible && (
+        <DialogAction
+          text="Change status of stop"
+          action1={() => handleStatusChange("arrived")}
+          actionKey1="Arrival"
+          action2={() => handleStatusChange("waiting")}
+          actionKey2="Waiting"
+        />
       )}
     </View>
   );
@@ -171,55 +134,6 @@ const styles = StyleSheet.create({
   bellIcon: {
     fontSize: 24,
     color: "#000",
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  fullWidthModalView: {
-    width: "90%",
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  button: {
-    backgroundColor: "#2196F3",
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 5,
-    width: "80%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 10,
-  },
-  closeButtonText: {
-    fontSize: 18,
-    color: "#333",
   },
 });
 

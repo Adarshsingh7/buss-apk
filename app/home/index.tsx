@@ -38,9 +38,10 @@ export default function index() {
   }, []);
 
   const { filteredStop: data, isLoading } = useGetUserRoute();
-  // console.log(data);
 
   if (isLoading) return <LoadingScreen />;
+
+  // if()
 
   if (!data || data.length === 0) {
     return (
@@ -58,6 +59,7 @@ export default function index() {
           dispatchTime={stop.arrivalTime}
           stopName={stop.name}
           status={stop.arrivalStatus}
+          id={stop._id}
         />
       ))}
     </ScrollView>

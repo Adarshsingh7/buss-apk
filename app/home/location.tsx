@@ -3,6 +3,7 @@ import { useAirDropAnimation } from "../hooks/useAirDropAnimation";
 import { useGPSNavigation } from "../hooks/useGPSNavigation";
 import { useQuery } from "@tanstack/react-query";
 import { UserType } from "../types";
+import { useDisableStopStatus } from "../features/stop/stop.hook";
 
 export default function LocationPage() {
   const { animations, isAnimating, startAnimation, stopAnimation } =
@@ -10,11 +11,16 @@ export default function LocationPage() {
   const { startGPSNavigationService, stopGPSNavigationService } =
     useGPSNavigation({ customFunction: stopAnimation });
   const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
+  const { mutate } = useDisableStopStatus();
 
   function handleToggleLocationSharing() {
     if (authUser?.role !== "driver")
       return alert("Only drivers can start the location sharing");
     if (!isAnimating) {
+      const routeId = authUser.route;
+      if (routeId) {
+        mutate(routeId);
+      }
       startGPSNavigationService();
       startAnimation();
     } else {
