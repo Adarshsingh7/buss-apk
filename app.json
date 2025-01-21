@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "app",
-    "slug": "app",
+    "name": "FastBus",
+    "slug": "fast-buss",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/images/buss-bee.jpg",
+    "scheme": "fast-buss",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
