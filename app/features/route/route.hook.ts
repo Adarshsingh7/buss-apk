@@ -22,9 +22,9 @@ const useGetUserRoute = function () {
     queryFn: () => stop.getAllStops(),
   });
 
-  const filteredStop = stops?.filter((stop) =>
-    userRoute?.stops?.some((el) => el === stop._id),
-  );
+  const filteredStop = userRoute?.stops
+    ?.map((routeStopId) => stops?.find((stop) => stop._id === routeStopId))
+    .filter(Boolean);
 
   const isLoading = userLoading || routeLoading || stopLoading;
 

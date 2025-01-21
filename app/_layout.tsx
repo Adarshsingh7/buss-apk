@@ -14,7 +14,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="index"
             options={{
-              title: "Main",
+              title: "Home",
               header: () => <CustomHeader title="Login" />,
             }}
           />
