@@ -89,4 +89,3 @@ class Auth {
 
 const auth = new Auth();
 export { auth };
-export default auth;

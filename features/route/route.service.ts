@@ -1,5 +1,5 @@
 import { RouteType } from "@/app/types";
-import BaseService from "@/app/utils/BaseService";
+import BaseService from "@/utils/BaseService";
 
 class RouteService extends BaseService<RouteType> {
   constructor() {

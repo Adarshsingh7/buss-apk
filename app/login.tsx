@@ -14,9 +14,9 @@ import {
   useMutation,
   useQuery,
 } from "@tanstack/react-query";
-import auth from "./features/auth/auth.service";
-import { useReAuth } from "./features/auth/auth.hook";
-import Button from "./components/Button";
+import { auth } from "@/features/auth/auth.service";
+import { useReAuth } from "@/features/auth/auth.hook";
+import Button from "@/components/Button";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +41,7 @@ const LoginScreen = () => {
   };
 
   useEffect(() => {
-    if (activeUser) navigation.navigate("/home");
+    if (activeUser) navigation.navigate("/(home)");
   }, [isPending, reAuthenicating]);
 
   return (
@@ -80,7 +80,7 @@ const LoginScreen = () => {
             Sign up
           </Text>
         </Text>
-        <Link href="/home">go to home</Link>
+        <Link href="/(home)">go to home</Link>
       </View>
     </QueryClientProvider>
   );

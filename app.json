@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "FastBus",
-    "slug": "fast-buss",
+    "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/buss-bee.jpg",
@@ -46,6 +46,7 @@
       "eas": {
         "projectId": "85fbac83-deff-408a-bb0a-ac40c1f8766e"
       }
-    }
+    },
+    "owner": "adarsh12q0"
   }
 }

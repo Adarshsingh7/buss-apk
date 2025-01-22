@@ -1,5 +1,5 @@
 import { LocationType } from "@/app/types";
-import BaseService from "@/app/utils/BaseService";
+import BaseService from "@/utils/BaseService";
 import axios from "axios";
 
 class LocationService extends BaseService<LocationType> {

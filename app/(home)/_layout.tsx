@@ -1,5 +1,5 @@
 import { Stack, Tabs } from "expo-router";
-import CustomHeader from "../components/header";
+import CustomHeader from "@/components/header";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function layout() {

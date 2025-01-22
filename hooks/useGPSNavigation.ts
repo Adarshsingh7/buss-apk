@@ -8,9 +8,9 @@ interface Props {
 
 export const useGPSNavigation = ({ customFunction }: Props) => {
   const {
-    location,
     startLocationUpdates,
     stopLocationUpdates,
+    location,
     isFetching,
     errorMsg,
   } = useCurrentLocation();

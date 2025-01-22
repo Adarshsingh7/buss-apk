@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
-import CustomHeader from "./components/header";
+import CustomHeader from "@/components/header";
 import { Provider as PaperProvider } from "react-native-paper";
 
 const queryClient = new QueryClient({
@@ -19,7 +19,7 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
-            name="home"
+            name="(home)"
             options={{
               title: "index",
               headerShown: false,

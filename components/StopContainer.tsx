@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { UserType } from "../types";
-import { useChangeStopStatus } from "../features/stop/stop.hook";
+import { useChangeStopStatus } from "@/features/stop/stop.hook";
 import LoadingScreen from "./LoadingScreen";
 import DialogAction from "./DialogAction";
 

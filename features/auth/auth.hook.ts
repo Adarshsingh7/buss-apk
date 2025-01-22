@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import auth from "./auth.service";
+import { auth } from "./auth.service";
 import { useRouter } from "expo-router";
 
 const useLogout = () => {
@@ -10,7 +10,7 @@ const useLogout = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["route"] });
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigation.navigate("/home");
+      navigation.navigate("/(home)");
     },
   });
 };

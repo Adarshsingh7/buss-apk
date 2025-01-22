@@ -1,9 +1,9 @@
 import { StyleSheet, View, Pressable, Text, Animated } from "react-native";
-import { useAirDropAnimation } from "../hooks/useAirDropAnimation";
-import { useGPSNavigation } from "../hooks/useGPSNavigation";
+import { useAirDropAnimation } from "@/hooks/useAirDropAnimation";
+import { useGPSNavigation } from "@/hooks/useGPSNavigation";
 import { useQuery } from "@tanstack/react-query";
 import { UserType } from "../types";
-import { useDisableStopStatus } from "../features/stop/stop.hook";
+import { useDisableStopStatus } from "@/features/stop/stop.hook";
 
 export default function LocationPage() {
   const { animations, isAnimating, startAnimation, stopAnimation } =

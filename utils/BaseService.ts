@@ -61,12 +61,17 @@ class BaseService<T> {
   // Update an existing resource by ID
   async update(id: string | number, data: Partial<T>): Promise<T> {
     await this.ensureToken();
-    console.log(data);
-    const response: AxiosResponse<{ data: T }> = await this.api.patch(
-      `/${id}`,
-      data,
-    );
-    return response.data.data;
+    try {
+      const response: AxiosResponse<{ data: T }> = await this.api.patch(
+        `/${id}`,
+        data,
+      );
+      console.log("data updated success");
+      return response.data.data;
+    } catch (error) {
+      console.error("Error updating resource:", error);
+      throw error;
+    }
   }
 
   // Delete a resource by ID

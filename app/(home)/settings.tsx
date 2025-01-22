@@ -8,10 +8,10 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Button from "../components/Button";
+import Button from "@/components/Button";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useNavigation, useRouter } from "expo-router";
-import { useLogout } from "../features/auth/auth.hook";
+import { useLogout } from "@/features/auth/auth.hook";
 
 const UserProfileScreen = () => {
   const navigation = useNavigation();

@@ -4,18 +4,19 @@ import * as Location from "expo-location";
 import * as Device from "expo-device";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import { useQuery } from "@tanstack/react-query";
-import { LocationType, UserType } from "../types";
+import { LocationType, UserType } from "@/app/types";
 import { location as locationService } from "../features/location/location.service";
 
 export function useCurrentLocation() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null,
-  );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isFetching, setIsFetching] = useState<boolean>(true);
+  ); // adding the location service demand from the user
+  const [errorMsg, setErrorMsg] = useState<string | null>(null); // storing the error messages if occoured in the fetching location process
+  const [isFetching, setIsFetching] = useState<boolean>(true); // stores the state of the fetching location
   const [subscription, setSubscription] =
-    useState<Location.LocationSubscription | null>(null);
-  const locationRef = useRef<Location.LocationObject | null>(null);
+    useState<Location.LocationSubscription | null>(null); // creates the subscription for location which can later be removed
+
+  const locationRef = useRef<Location.LocationObject | null>(null); // stores the reference for the location used for sending location in use effects
 
   const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
   const { data: locationData } = useQuery<LocationType>({
@@ -81,7 +82,6 @@ export function useCurrentLocation() {
           locationRef.current &&
           locationData
         ) {
-          console.log(`sending location ${locationData}`);
           await locationService.updateLocation(locationData._id, {
             latitude: locationRef.current.coords.latitude,
             longitude: locationRef.current.coords.longitude,
@@ -96,20 +96,10 @@ export function useCurrentLocation() {
     return () => clearInterval(intervalId);
   }, [authUser, locationData]);
 
-  let text = "Waiting...";
-  if (errorMsg) {
-    text = errorMsg;
-  } else if (location) {
-    text = JSON.stringify(location);
-  } else if (isFetching) {
-    text = "Fetching location...";
-  }
-
   return {
     location,
     errorMsg,
     isFetching,
-    text,
     startLocationUpdates,
     stopLocationUpdates,
   };
