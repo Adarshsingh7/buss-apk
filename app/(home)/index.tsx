@@ -6,6 +6,7 @@ import { StopType, UserType } from "@/app/types";
 import { useGetUserRoute } from "@/features/route/route.hook";
 import LoadingScreen from "@/components/LoadingScreen";
 import { location } from "@/features/location/location.service";
+import { useTheme } from "@/context/themeContext";
 
 export default function index() {
   const { data: activeUser } = useQuery<UserType>({ queryKey: ["user"] });
@@ -13,6 +14,7 @@ export default function index() {
     queryKey: ["location"],
     queryFn: () => location.getLocationFromRoute(activeUser?.route || ""),
   });
+  const { theme } = useTheme();
   const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
@@ -34,8 +36,10 @@ export default function index() {
 
   if (!data || data.length === 0) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.noStopsText}>Huray! you have no stops</Text>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.noStopsText, { color: theme.text }]}>
+          Huray! you have no stops
+        </Text>
       </View>
     );
   }
@@ -53,21 +57,22 @@ export default function index() {
   if (!data) return <LoadingScreen />;
 
   return (
-    <Animated.FlatList
-      data={data}
-      renderItem={(data) => renderItem(data)}
-      keyExtractor={(item, index) => index.toString()}
-      onScroll={Animated.event(
-        [{ nativeEvent: { contentOffset: { y: new Animated.Value(0) } } }],
-        { useNativeDriver: true },
-      )}
-    />
+    <View style={{ backgroundColor: theme.background }}>
+      <Animated.FlatList
+        data={data}
+        renderItem={(data) => renderItem(data)}
+        keyExtractor={(item, index) => index.toString()}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: new Animated.Value(0) } } }],
+          { useNativeDriver: true },
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   noStopsText: {
-    color: "#000",
     fontSize: 16,
   },
   container: {

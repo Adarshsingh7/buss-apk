@@ -17,6 +17,7 @@ import {
 import { auth } from "@/features/auth/auth.service";
 import { useReAuth } from "@/features/auth/auth.hook";
 import Button from "@/components/Button";
+import { useTheme } from "@/context/themeContext";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const LoginScreen = () => {
     queryKey: ["user"],
     queryFn: auth.isAuthenticated,
   });
+  const { theme } = useTheme();
 
   const { mutate: reAuth, isPending: reAuthenicating } = useReAuth();
 
@@ -46,12 +48,17 @@ const LoginScreen = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Login to your account</Text>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.title, { color: theme.text }]}>Welcome Back</Text>
+        <Text style={[styles.subtitle, { color: theme.text }]}>
+          Login to your account
+        </Text>
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { backgroundColor: theme.background, color: theme.text },
+          ]}
           placeholder="Email"
           keyboardType="email-address"
           autoCapitalize="none"
@@ -61,9 +68,14 @@ const LoginScreen = () => {
         />
 
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            { backgroundColor: theme.background, color: theme.text },
+          ]}
           placeholder="Password"
+          keyboardType="default"
           secureTextEntry
+          autoCapitalize="none"
           value={password}
           onChangeText={setPassword}
           placeholderTextColor="#aaa"
@@ -80,7 +92,9 @@ const LoginScreen = () => {
             Sign up
           </Text>
         </Text>
-        <Link href="/(home)">go to home</Link>
+        <Link href="/(home)" style={{ color: theme.text }}>
+          go to home
+        </Link>
       </View>
     </QueryClientProvider>
   );
@@ -91,18 +105,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9fafd",
     padding: 20,
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#333",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 18,
-    color: "#666",
     marginBottom: 30,
   },
   input: {
@@ -113,7 +124,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: "#fff",
   },
   button: {
     width: "100%",

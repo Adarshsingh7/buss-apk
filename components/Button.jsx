@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
   View,
 } from "react-native";
+import { useTheme } from "@/context/themeContext";
+
 const Button = (props) => {
   const {
     title = "Button",
@@ -15,14 +17,18 @@ const Button = (props) => {
     buttonStyle = {},
     textStyle = {},
     icon = null,
-    color = "#007AFF",
+    color,
   } = props;
+
+  const { theme } = useTheme();
+  const buttonColor = color || theme.primary;
+
   return (
     <TouchableOpacity
       style={[
         styles.button,
         buttonStyle,
-        { backgroundColor: color },
+        { backgroundColor: buttonColor },
         disabled && styles.disabledButton,
       ]}
       onPress={onPress}

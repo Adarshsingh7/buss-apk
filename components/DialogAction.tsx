@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Button, Dialog, Portal } from "react-native-paper";
+import { useTheme } from "@/context/themeContext";
 
 type DialogActionProps = {
   text: string;
@@ -18,11 +19,12 @@ const DialogAction = ({
 }: DialogActionProps) => {
   const [visible, setVisible] = React.useState(true);
   const hideDialog = () => setVisible(false);
+  const { theme } = useTheme();
 
   return (
     <Portal>
-      <Dialog visible={visible} onDismiss={hideDialog}>
-        <Dialog.Title>{text}</Dialog.Title>
+      <Dialog visible={visible} style={{ backgroundColor: theme.background }}>
+        <Dialog.Title style={{ color: theme.text }}>{text}</Dialog.Title>
         <Dialog.Actions>
           {action1 && (
             <Button
@@ -32,6 +34,7 @@ const DialogAction = ({
                   action1();
                 }
               }}
+              textColor={theme.primary}
             >
               {actionKey1}
             </Button>
@@ -44,11 +47,11 @@ const DialogAction = ({
                   action2();
                 }
               }}
+              textColor={theme.primary}
             >
               {actionKey2}
             </Button>
           )}
-          {/* <Button onPress={action}>{actionKey2}</Button> */}
         </Dialog.Actions>
       </Dialog>
     </Portal>

@@ -10,7 +10,7 @@ const useLogout = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["route"] });
       queryClient.invalidateQueries({ queryKey: ["user"] });
-      navigation.navigate("/(home)");
+      // navigation.navigate("/login");
     },
   });
 };

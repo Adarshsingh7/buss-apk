@@ -1,10 +1,20 @@
 import { Stack, Tabs } from "expo-router";
 import CustomHeader from "@/components/header";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/context/themeContext";
 
 export default function layout() {
+  const { theme } = useTheme();
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        headerTintColor: theme.primary,
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.gray,
+        tabBarInactiveBackgroundColor: theme.background,
+        tabBarActiveBackgroundColor: theme.background,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

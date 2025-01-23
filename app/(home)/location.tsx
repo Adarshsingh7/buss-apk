@@ -4,6 +4,7 @@ import { useGPSNavigation } from "@/hooks/useGPSNavigation";
 import { useQuery } from "@tanstack/react-query";
 import { UserType } from "../types";
 import { useDisableStopStatus } from "@/features/stop/stop.hook";
+import { useTheme } from "@/context/themeContext";
 
 export default function LocationPage() {
   const { animations, isAnimating, startAnimation, stopAnimation } =
@@ -12,6 +13,7 @@ export default function LocationPage() {
     useGPSNavigation({ customFunction: stopAnimation });
   const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
   const { mutate } = useDisableStopStatus();
+  const { theme } = useTheme();
 
   function handleToggleLocationSharing() {
     if (authUser?.role !== "driver")
@@ -30,7 +32,7 @@ export default function LocationPage() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Main circle container */}
       <View style={styles.circleContainer}>
         {/* Animated waves */}
@@ -52,21 +54,29 @@ export default function LocationPage() {
                   inputRange: [0, 1],
                   outputRange: [0.6, 0],
                 }),
+                backgroundColor: theme.primary,
               },
             ]}
           />
         ))}
 
         {/* Center circle */}
-        <View style={styles.centerCircle} />
+        <View
+          style={[styles.centerCircle, { backgroundColor: theme.primary }]}
+        />
       </View>
 
       {/* Start button */}
       <Pressable
-        style={({ pressed }) => [styles.button, { opacity: pressed ? 0.8 : 1 }]}
+        style={({ pressed }) => [
+          styles.button,
+          { opacity: pressed ? 0.8 : 1, backgroundColor: theme.primary },
+        ]}
         onPress={handleToggleLocationSharing}
       >
-        <Text style={styles.buttonText}>{!isAnimating ? "Start" : "Stop"}</Text>
+        <Text style={[styles.buttonText, { color: "#fff" }]}>
+          {!isAnimating ? "Start" : "Stop"}
+        </Text>
       </Pressable>
     </View>
   );
@@ -75,7 +85,6 @@ export default function LocationPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     paddingBottom: 100, // Space for button at bottom
@@ -90,20 +99,17 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#007AFF",
     position: "absolute",
   },
   wave: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#007AFF",
     position: "absolute",
   },
   button: {
     position: "absolute",
     bottom: 50,
-    backgroundColor: "#007AFF",
     paddingVertical: 16,
     paddingHorizontal: 48,
     borderRadius: 30,
@@ -117,7 +123,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   buttonText: {
-    color: "#fff",
     fontSize: 18,
     fontWeight: "600",
   },

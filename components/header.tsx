@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons"; // For iOS-style icons
+import { useTheme } from "@/context/themeContext";
 
 interface CustomHeaderProps {
   title?: string;
@@ -17,17 +18,20 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
   leftIcon = "chevron-back",
   rightIcon = "ellipsis-horizontal",
 }) => {
+  const { theme } = useTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Left Button */}
       <TouchableOpacity onPress={onLeftPress} style={styles.leftButton}>
-        {leftIcon && <Ionicons name={leftIcon} size={24} color="#007AFF" />}
+        {leftIcon && (
+          <Ionicons name={leftIcon} size={24} color={theme.primary} />
+        )}
       </TouchableOpacity>
       {/* Title */}
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
       {/* Right Button */}
       <TouchableOpacity onPress={onRightPress} style={styles.rightButton}>
-        <Ionicons name={rightIcon} size={24} color="#007AFF" />
+        <Ionicons name={rightIcon} size={24} color={theme.primary} />
       </TouchableOpacity>
     </View>
   );

@@ -2,10 +2,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { UserType } from "../types";
+import { UserType } from "@/app/types";
 import { useChangeStopStatus } from "@/features/stop/stop.hook";
 import LoadingScreen from "./LoadingScreen";
 import DialogAction from "./DialogAction";
+import { useTheme } from "@/context/themeContext";
 
 const TrainStopContainer = ({
   stopName = "Station A",
@@ -17,7 +18,6 @@ const TrainStopContainer = ({
   id = "0",
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const lateColor = lateStatus ? "#FF4C4C" : "#4CAF50";
   const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
   const { mutate, isPending } = useChangeStopStatus();
 
@@ -25,37 +25,44 @@ const TrainStopContainer = ({
     setModalVisible(false);
     mutate({ id, arrivalStatus: newStatus });
   };
-
-  // if (isPending) return <LoadingScreen />;
+  const { theme } = useTheme();
+  const lateColor = lateStatus ? theme.secondary : theme.primary;
 
   return (
     <View
-      style={status === "waiting" ? styles.container : styles.coloredContainer}
+      style={[
+        styles.container,
+        { backgroundColor: status === "waiting" ? theme.background : "green" },
+      ]}
     >
       <View style={styles.header}>
-        <Text style={styles.stopName}>{stopName}</Text>
-        <Text style={[styles.lateStatus, { color: lateColor }]}>
+        <Text style={[styles.stopName, { color: theme.text }]}>{stopName}</Text>
+        <Text style={[styles.lateStatus, { color: "green" }]}>
           {lateStatus ? "Late" : "On Time"}
         </Text>
       </View>
       {isPending && <LoadingScreen />}
       <View style={styles.detailsRow}>
         <View style={styles.detailItem}>
-          <Text style={styles.label}>Arrival</Text>
-          <Text style={styles.value}>{arrivalTime}</Text>
+          <Text style={[styles.label, { color: theme.text }]}>Arrival</Text>
+          <Text style={[styles.value, { color: theme.text }]}>
+            {arrivalTime}
+          </Text>
         </View>
         <View style={styles.detailItem}>
-          <Text style={styles.label}>Dispatch</Text>
-          <Text style={styles.value}>{dispatchTime}</Text>
+          <Text style={[styles.label, { color: theme.text }]}>Dispatch</Text>
+          <Text style={[styles.value, { color: theme.text }]}>
+            {dispatchTime}
+          </Text>
         </View>
         <View style={styles.detailItem}>
-          <Text style={styles.label}>Distance</Text>
-          <Text style={styles.value}>{distance}</Text>
+          <Text style={[styles.label, { color: theme.text }]}>Distance</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{distance}</Text>
         </View>
         {authUser?.role === "driver" && (
           <Pressable onPress={() => setModalVisible(true)}>
             <Text style={styles.bellIcon}>
-              <FontAwesome name="exchange" size={24} color="black" />
+              <FontAwesome name="exchange" size={24} color={theme.primary} />
             </Text>
           </Pressable>
         )}
@@ -76,7 +83,6 @@ const TrainStopContainer = ({
 // Styles
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#f8f8f8",
     borderRadius: 8,
     padding: 10,
     marginVertical: 5,
@@ -87,7 +93,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   coloredContainer: {
-    backgroundColor: "#C8E6C9",
     borderRadius: 8,
     padding: 10,
     marginVertical: 5,
@@ -106,7 +111,6 @@ const styles = StyleSheet.create({
   stopName: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#333",
   },
   lateStatus: {
     fontSize: 14,
@@ -124,16 +128,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: "#666",
   },
   value: {
     fontSize: 12,
-    color: "#333",
     fontWeight: "600",
   },
   bellIcon: {
     fontSize: 24,
-    color: "#000",
   },
 });
 

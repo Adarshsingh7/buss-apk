@@ -6,121 +6,273 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Dimensions,
+  StatusBar,
+  Switch,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import Button from "@/components/Button";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { useNavigation, useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons, Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { useLogout } from "@/features/auth/auth.hook";
+import { useTheme } from "@/context/themeContext";
+
+const { width } = Dimensions.get("window");
 
 const UserProfileScreen = () => {
-  const navigation = useNavigation();
+  const { theme, toggleTheme, changePrimiaryColor, themeMode } = useTheme();
   const { mutate: logout } = useLogout();
   const router = useRouter();
+
+  const handleLogout = () => {
+    router.replace("/(home)");
+    logout();
+  };
+
+  const handleChangeColor = (color: string) => {
+    changePrimiaryColor(color);
+    console.log("CHANGING THE THEME");
+  };
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Header Section */}
-      <View style={styles.header}>
-        <Image
-          source={{
-            uri: "https://via.placeholder.com/150",
-          }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.userName}>John Doe</Text>
-        <Text style={styles.userEmail}>johndoe@example.com</Text>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <StatusBar
+        barStyle={themeMode === "dark" ? "light-content" : "dark-content"}
+      />
 
-      {/* Settings Options */}
-      <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.option}>
-          <Ionicons name="person-outline" size={20} color="#333" />
-          <Text style={styles.optionText}>Account Settings</Text>
-          <Ionicons name="chevron-forward" size={20} color="#aaa" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.option}>
-          <Ionicons name="notifications-outline" size={20} color="#333" />
-          <Text style={styles.optionText}>Notifications</Text>
-          <Ionicons name="chevron-forward" size={20} color="#aaa" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.option}>
-          <Ionicons name="lock-closed-outline" size={20} color="#333" />
-          <Text style={styles.optionText}>Privacy</Text>
-          <Ionicons name="chevron-forward" size={20} color="#aaa" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.option}>
-          <Ionicons name="help-circle-outline" size={20} color="#333" />
-          <Text style={styles.optionText}>Help & Support</Text>
-          <Ionicons name="chevron-forward" size={20} color="#aaa" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.option}>
-          <Ionicons name="settings-outline" size={20} color="#333" />
-          <Text style={styles.optionText}>App Settings</Text>
-          <Ionicons name="chevron-forward" size={20} color="#aaa" />
-        </TouchableOpacity>
-      </View>
+      {/* Modern Header Section */}
+      <LinearGradient
+        colors={[theme.primary, `${theme.primary}80`]}
+        style={styles.headerGradient}
+      >
+        <View style={styles.headerContent}>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: "https://via.placeholder.com/150" }}
+              style={styles.profileImage}
+            />
+            <TouchableOpacity
+              style={[styles.editButton, { backgroundColor: theme.primary }]}
+            >
+              <Feather name="edit-2" size={16} color="white" />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.userName}>John Doe</Text>
+          <Text style={styles.userEmail}>john.doe@example.com</Text>
+        </View>
+      </LinearGradient>
 
-      {/* Logout Button */}
-      <View style={{ marginVertical: 15, paddingHorizontal: 10 }}>
-        <Button
-          onPress={logout}
-          title="Logout"
-          color="#E64A19"
-          icon={<AntDesign name="logout" size={24} color="white" />}
-        />
-      </View>
-    </ScrollView>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Theme Section */}
+        <View style={[styles.section, { backgroundColor: theme.card }]}>
+          <View style={styles.sectionHeader}>
+            <Feather name="sun" size={20} color={theme.primary} />
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Appearance
+            </Text>
+          </View>
+
+          {/* Theme Toggle */}
+          <TouchableOpacity
+            style={[styles.themeToggle, { backgroundColor: theme.background }]}
+            // onPress={toggleTheme}
+          >
+            <View style={styles.themeToggleContent}>
+              <Feather
+                name={themeMode === "dark" ? "moon" : "sun"}
+                size={20}
+                color={theme.primary}
+              />
+              <Text style={[styles.themeToggleText, { color: theme.text }]}>
+                {themeMode === "dark" ? "Dark Mode" : "Light Mode"}
+              </Text>
+            </View>
+            <Switch
+              value={themeMode === "dark"}
+              onValueChange={toggleTheme}
+              thumbColor={theme.primary}
+              trackColor={{ false: theme.gray, true: theme.gray }}
+              ios_backgroundColor={theme.background}
+            />
+          </TouchableOpacity>
+
+          {/* Color Picker */}
+          <Text style={[styles.colorTitle, { color: theme.text }]}>
+            Theme Color
+          </Text>
+          <View style={styles.colorGrid}>
+            {[
+              "#512DA8",
+              "#36454F",
+              "#001F3F",
+              "#800020",
+              "#228B22",
+              "#FFBF00",
+              "#008080",
+              "#B7410E",
+              "#77815C",
+              "#483C32",
+              "#1877F2",
+              "#DC143C",
+            ].map((color) => (
+              <TouchableOpacity
+                key={color}
+                style={[
+                  styles.colorOption,
+                  { backgroundColor: color },
+                  color === theme.primary && styles.selectedColor,
+                ]}
+                onPress={() => handleChangeColor(color)}
+              >
+                {color === theme.primary && (
+                  <Feather name="check" size={18} color="white" />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Account Section */}
+        <View style={[styles.section]}>
+          <View style={styles.sectionHeader}>
+            <Feather name="user" size={20} color={theme.text} />
+            <Text style={[styles.sectionTitle, { color: theme.text }]}>
+              Account
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.logoutButton, { backgroundColor: theme.primary }]}
+            onPress={handleLogout}
+          >
+            <Feather name="log-out" size={20} color="white" />
+            <Text style={styles.logoutText}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
   },
-  header: {
+  headerGradient: {
+    paddingTop: 60,
+    paddingBottom: 40,
+  },
+  headerContent: {
     alignItems: "center",
-    paddingVertical: 30,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+  },
+  imageContainer: {
+    position: "relative",
+    marginBottom: 16,
   },
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginBottom: 10,
+    borderWidth: 4,
+    borderColor: "white",
+  },
+  editButton: {
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#007AFF",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "white",
   },
   userName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
+    fontSize: 24,
+    fontWeight: "600",
+    color: "white",
+    marginBottom: 4,
   },
   userEmail: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 5,
+    fontSize: 15,
+    color: "rgba(255,255,255,0.9)",
   },
-  optionsContainer: {
-    marginTop: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    marginHorizontal: 15,
-    overflow: "hidden",
+  content: {
+    flex: 1,
+    padding: 20,
   },
-  option: {
+  section: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+  },
+  sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    marginBottom: 20,
   },
-  optionText: {
-    flex: 1,
-    marginLeft: 15,
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginLeft: 12,
+  },
+  themeToggle: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  themeToggleContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  themeToggleText: {
+    fontSize: 15,
+    marginLeft: 12,
+  },
+  toggleIndicator: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  colorTitle: {
+    fontSize: 15,
+    marginBottom: 16,
+  },
+  colorGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginHorizontal: -6,
+  },
+  colorOption: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    margin: 6,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  selectedColor: {
+    borderWidth: 3,
+    borderColor: "white",
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 16,
+    borderRadius: 12,
+  },
+  logoutText: {
+    color: "white",
     fontSize: 16,
-    color: "#333",
+    fontWeight: "500",
+    marginLeft: 8,
   },
 });
 
