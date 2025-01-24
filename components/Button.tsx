@@ -1,14 +1,29 @@
 import React from "react";
 import {
-  TouchableOpacity,
+  Pressable,
   Text,
   StyleSheet,
   ActivityIndicator,
   View,
+  StyleProp,
+  TextStyle,
+  ViewStyle,
 } from "react-native";
 import { useTheme } from "@/context/themeContext";
 
-const Button = (props) => {
+interface ButtonProps {
+  title?: string;
+  onPress: () => void;
+  disabled?: boolean;
+  loading?: boolean;
+  buttonStyle?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  icon?: React.ReactNode;
+  color?: string;
+  children?: React.ReactNode;
+}
+
+const Button: React.FC<ButtonProps> = (props) => {
   const {
     title = "Button",
     onPress,
@@ -18,17 +33,18 @@ const Button = (props) => {
     textStyle = {},
     icon = null,
     color,
+    children,
   } = props;
 
   const { theme } = useTheme();
   const buttonColor = color || theme.primary;
 
   return (
-    <TouchableOpacity
-      style={[
+    <Pressable
+      style={({ pressed }) => [
         styles.button,
         buttonStyle,
-        { backgroundColor: buttonColor },
+        { opacity: pressed ? 0.8 : 1, backgroundColor: buttonColor },
         disabled && styles.disabledButton,
       ]}
       onPress={onPress}
@@ -39,27 +55,30 @@ const Button = (props) => {
       ) : (
         <View style={styles.content}>
           {icon && <View style={styles.icon}>{icon}</View>}
-          <Text style={[styles.text, textStyle]}>{title}</Text>
+          {children ? (
+            children
+          ) : (
+            <Text style={[styles.text, textStyle]}>{title}</Text>
+          )}
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
 // Styles
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#007AFF", // iOS blue color
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3, // Android shadow
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 2, // Android shadow
     flexDirection: "row",
     width: "100%", // Full width
   },

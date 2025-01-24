@@ -6,30 +6,28 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   StatusBar,
   Switch,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons, Feather } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useLogout } from "@/features/auth/auth.hook";
 import { useTheme } from "@/context/themeContext";
-
-const { width } = Dimensions.get("window");
+import Button from "@/components/Button";
 
 const UserProfileScreen = () => {
-  const { theme, toggleTheme, changePrimiaryColor, themeMode } = useTheme();
+  const { theme, toggleTheme, changePrimaryColor, themeMode } = useTheme();
   const { mutate: logout } = useLogout();
   const router = useRouter();
 
   const handleLogout = () => {
-    router.replace("/(home)");
+    router.replace("../../..");
     logout();
   };
 
   const handleChangeColor = (color: string) => {
-    changePrimiaryColor(color);
+    changePrimaryColor(color);
     console.log("CHANGING THE THEME");
   };
 
@@ -63,7 +61,7 @@ const UserProfileScreen = () => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Theme Section */}
-        <View style={[styles.section, { backgroundColor: theme.card }]}>
+        <View style={[styles.section]}>
           <View style={styles.sectionHeader}>
             <Feather name="sun" size={20} color={theme.primary} />
             <Text style={[styles.sectionTitle, { color: theme.text }]}>
@@ -74,7 +72,6 @@ const UserProfileScreen = () => {
           {/* Theme Toggle */}
           <TouchableOpacity
             style={[styles.themeToggle, { backgroundColor: theme.background }]}
-            // onPress={toggleTheme}
           >
             <View style={styles.themeToggleContent}>
               <Feather
@@ -139,14 +136,7 @@ const UserProfileScreen = () => {
               Account
             </Text>
           </View>
-
-          <TouchableOpacity
-            style={[styles.logoutButton, { backgroundColor: theme.primary }]}
-            onPress={handleLogout}
-          >
-            <Feather name="log-out" size={20} color="white" />
-            <Text style={styles.logoutText}>Sign Out</Text>
-          </TouchableOpacity>
+          <Button onPress={handleLogout} title="Sign out" />
         </View>
       </ScrollView>
     </View>
@@ -182,7 +172,6 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#007AFF",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
@@ -233,13 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginLeft: 12,
   },
-  toggleIndicator: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   colorTitle: {
     fontSize: 15,
     marginBottom: 16,
@@ -260,19 +242,6 @@ const styles = StyleSheet.create({
   selectedColor: {
     borderWidth: 3,
     borderColor: "white",
-  },
-  logoutButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 16,
-    borderRadius: 12,
-  },
-  logoutText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "500",
-    marginLeft: 8,
   },
 });
 

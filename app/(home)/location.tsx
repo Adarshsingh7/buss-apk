@@ -67,7 +67,7 @@ export default function LocationPage() {
       </View>
 
       {/* Start button */}
-      <Pressable
+      {/* <Pressable
         style={({ pressed }) => [
           styles.button,
           { opacity: pressed ? 0.8 : 1, backgroundColor: theme.primary },
@@ -77,10 +77,36 @@ export default function LocationPage() {
         <Text style={[styles.buttonText, { color: "#fff" }]}>
           {!isAnimating ? "Start" : "Stop"}
         </Text>
-      </Pressable>
+      </Pressable> */}
+      <Button onPress={handleToggleLocationSharing}>
+        <Text style={[styles.buttonText, { color: "#fff" }]}>
+          {!isAnimating ? "Start" : "Stop"}
+        </Text>
+      </Button>
     </View>
   );
 }
+
+interface ButtonProps {
+  onPress: () => void;
+  children: React.ReactNode;
+}
+
+const Button = ({ onPress, children }: ButtonProps) => {
+  const { theme } = useTheme();
+
+  return (
+    <Pressable
+      style={({ pressed }) => [
+        styles.button,
+        { opacity: pressed ? 0.8 : 1, backgroundColor: theme.primary },
+      ]}
+      onPress={onPress}
+    >
+      {children}
+    </Pressable>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

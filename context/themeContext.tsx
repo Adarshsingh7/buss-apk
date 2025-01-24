@@ -1,4 +1,13 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen";
+SplashScreen.preventAutoHideAsync();
 
 // Define the shape of the context value
 interface ThemeContextType {
@@ -12,19 +21,60 @@ interface ThemeContextType {
     secondary: string;
     gray: string;
   };
-  changePrimiaryColor: (color: string) => void;
+  changePrimaryColor: (color: string) => void;
 }
 
 // Create a context with a default value
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// AsyncStorage keys
+const THEME_MODE_KEY = "themeMode";
+const PRIMARY_COLOR_KEY = "primaryColor";
 
 // Create a provider component
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [themeMode, setThemeMode] = useState("light");
   const [primaryColor, setPrimaryColor] = useState("#512DA8");
 
-  const toggleTheme = () => {
-    setThemeMode((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+  // Load theme mode and primary color from AsyncStorage on mount
+  useEffect(() => {
+    const loadThemeSettings = async () => {
+      try {
+        const storedThemeMode = await AsyncStorage.getItem(THEME_MODE_KEY);
+        const storedPrimaryColor =
+          await AsyncStorage.getItem(PRIMARY_COLOR_KEY);
+
+        if (storedThemeMode) setThemeMode(storedThemeMode);
+        if (storedPrimaryColor) setPrimaryColor(storedPrimaryColor);
+      } catch (error) {
+        console.error("Failed to load theme settings:", error);
+      } finally {
+        // setIsLoading(false);
+        SplashScreen.hideAsync(); // Hide splash screen once done
+      }
+    };
+
+    loadThemeSettings();
+  }, []);
+  // Persist theme mode to AsyncStorage
+  const toggleTheme = async () => {
+    try {
+      const newThemeMode = themeMode === "light" ? "dark" : "light";
+      setThemeMode(newThemeMode);
+      await AsyncStorage.setItem(THEME_MODE_KEY, newThemeMode);
+    } catch (error) {
+      console.error("Failed to save theme mode to storage:", error);
+    }
+  };
+
+  // Persist primary color to AsyncStorage
+  const changePrimaryColor = async (color: string) => {
+    try {
+      setPrimaryColor(color);
+      await AsyncStorage.setItem(PRIMARY_COLOR_KEY, color);
+    } catch (error) {
+      console.error("Failed to save primary color to storage:", error);
+    }
   };
 
   const theme = {
@@ -42,7 +92,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         themeMode,
         toggleTheme,
         theme,
-        changePrimiaryColor: setPrimaryColor,
+        changePrimaryColor,
       }}
     >
       {children}

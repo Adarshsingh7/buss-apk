@@ -1,7 +1,9 @@
+import { useTheme } from "@/context/themeContext";
 import { Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
 const LoadingScreen = function ({}) {
+  const { theme } = useTheme();
   return (
     <View
       style={{
@@ -14,7 +16,7 @@ const LoadingScreen = function ({}) {
         alignItems: "center",
       }}
     >
-      <ActivityIndicator size="large" color="#a9a9e8" />
+      <ActivityIndicator size="large" color={theme.primary} />
       {/* <Text>Loading...</Text> */}
     </View>
   );
