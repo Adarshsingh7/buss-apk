@@ -5,9 +5,11 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
+import { StatusBar } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as SplashScreen from "expo-splash-screen";
-SplashScreen.preventAutoHideAsync();
+import { hideScreen, showScreen } from "@/hooks/useHideScreen";
+
+hideScreen();
 
 // Define the shape of the context value
 interface ThemeContextType {
@@ -20,6 +22,7 @@ interface ThemeContextType {
     primary: string;
     secondary: string;
     gray: string;
+    success: string;
   };
   changePrimaryColor: (color: string) => void;
 }
@@ -49,13 +52,21 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         console.error("Failed to load theme settings:", error);
       } finally {
-        // setIsLoading(false);
-        SplashScreen.hideAsync(); // Hide splash screen once done
+        showScreen(); // Hide splash screen once done
       }
     };
 
     loadThemeSettings();
   }, []);
+
+  // Update the status bar whenever themeMode changes
+  useEffect(() => {
+    StatusBar.setBarStyle(
+      themeMode === "light" ? "dark-content" : "light-content",
+    );
+    StatusBar.setBackgroundColor(themeMode === "light" ? "#FAFAFA" : "#212121");
+  }, [themeMode]);
+
   // Persist theme mode to AsyncStorage
   const toggleTheme = async () => {
     try {
@@ -84,6 +95,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     heading: themeMode === "light" ? "#0070C9" : "#003366",
     secondary: themeMode === "light" ? "#FFFFFF" : "#808080",
     gray: "#6E6E6E",
+    success: "#A5D6A7",
   };
 
   return (

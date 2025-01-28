@@ -19,8 +19,6 @@ import { useReAuth } from "@/features/auth/auth.hook";
 import Button from "@/components/Button";
 import { useTheme } from "@/context/themeContext";
 
-const queryClient = new QueryClient();
-
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,6 +27,7 @@ const LoginScreen = () => {
     queryKey: ["user"],
     queryFn: auth.isAuthenticated,
   });
+  const queryClient = new QueryClient();
   const { theme } = useTheme();
 
   const { mutate: reAuth, isPending: reAuthenicating } = useReAuth();

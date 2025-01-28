@@ -1,4 +1,4 @@
-import { FontAwesome } from "@expo/vector-icons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
@@ -7,6 +7,7 @@ import { useChangeStopStatus } from "@/features/stop/stop.hook";
 import LoadingScreen from "./LoadingScreen";
 import DialogAction from "./DialogAction";
 import { useTheme } from "@/context/themeContext";
+// import { auth } from "@/features/auth/auth.service";
 
 const TrainStopContainer = ({
   stopName = "Station A",
@@ -32,7 +33,10 @@ const TrainStopContainer = ({
     <View
       style={[
         styles.container,
-        { backgroundColor: status === "waiting" ? theme.background : "green" },
+        {
+          backgroundColor:
+            status === "waiting" ? theme.background : theme.success,
+        },
       ]}
     >
       <View style={styles.header}>
@@ -60,20 +64,33 @@ const TrainStopContainer = ({
           <Text style={[styles.value, { color: theme.text }]}>{distance}</Text>
         </View>
         {authUser?.role === "driver" && (
-          <Pressable onPress={() => setModalVisible(true)}>
+          <Pressable
+            onPress={() => setModalVisible(true)}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+          >
             <Text style={styles.bellIcon}>
-              <FontAwesome name="exchange" size={24} color={theme.primary} />
+              <MaterialIcons
+                name="change-circle"
+                size={24}
+                color={theme.primary}
+              />
             </Text>
           </Pressable>
         )}
       </View>
       {authUser?.role === "driver" && modalVisible && (
         <DialogAction
-          text="Change status of stop"
-          action1={() => handleStatusChange("arrived")}
-          actionKey1="Arrival"
-          action2={() => handleStatusChange("waiting")}
-          actionKey2="Waiting"
+          title="Change the status of Stop"
+          key={authUser._id}
+          message="This is the test message"
+          primaryButton={{
+            text: "Arrival",
+            onPress: () => handleStatusChange("arrived"),
+          }}
+          secondaryButton={{
+            text: "Waiting",
+            onPress: () => handleStatusChange("waiting"),
+          }}
         />
       )}
     </View>
