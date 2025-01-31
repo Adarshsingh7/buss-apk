@@ -15,9 +15,12 @@ import { useRouter } from "expo-router";
 import { useLogout } from "@/features/auth/auth.hook";
 import { useTheme } from "@/context/themeContext";
 import Button from "@/components/Button";
+import { useQuery } from "@tanstack/react-query";
+import { UserType } from "../types";
 
 const UserProfileScreen = () => {
   const { theme, toggleTheme, changePrimaryColor, themeMode } = useTheme();
+  const { data: authUser } = useQuery<UserType>({ queryKey: ["user"] });
   const { mutate: logout } = useLogout();
   const router = useRouter();
 
@@ -45,7 +48,7 @@ const UserProfileScreen = () => {
         <View style={styles.headerContent}>
           <View style={styles.imageContainer}>
             <Image
-              source={{ uri: "https://via.placeholder.com/150" }}
+              source={{ uri: authUser.photo }}
               style={styles.profileImage}
             />
             <TouchableOpacity
@@ -54,8 +57,8 @@ const UserProfileScreen = () => {
               <Feather name="edit-2" size={16} color="white" />
             </TouchableOpacity>
           </View>
-          <Text style={styles.userName}>John Doe</Text>
-          <Text style={styles.userEmail}>john.doe@example.com</Text>
+          <Text style={styles.userName}>{authUser.name}</Text>
+          <Text style={styles.userEmail}>{authUser.email}</Text>
         </View>
       </LinearGradient>
 
